@@ -4,6 +4,16 @@ var router = express.Router();
 
 var User = require('../models/user');
 
+/* Utility function to check if user is authenticatd */
+function requireAuth(req, res, next){
+  
+    // check if the user is logged in
+  if(!req.isAuthenticated()){
+    return res.redirect('/login');
+  }
+  next();
+}
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { 
@@ -69,6 +79,15 @@ router.post('/login', passport.authenticate('local-login', {
 router.get('/logout', function (req, res){
   req.logout();
   res.redirect('/');
+});
+
+/* Render todoList page. */
+router.get('/todoList', requireAuth, function(req, res, next) {
+  res.render('todoList', { 
+      title: 'Todo List',
+      displayName: req.user ? req.user.displayName : '',
+      username: req.user ? req.user.username : '' 
+  });
 });
 
 module.exports = router;
